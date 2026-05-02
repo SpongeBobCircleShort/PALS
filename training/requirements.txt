@@ -1,0 +1,13 @@
+sentence-transformers
+datasets
+transformers
+accelerate
+torch
+pypdf
+pinecone
+tqdm
+pandas
+scikit-learn
+pyyaml
+python-dotenv
+numpy

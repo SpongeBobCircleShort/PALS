@@ -1,0 +1,10 @@
+node_modules
+.next
+.env
+.venv
+*.pyc
+__pycache__/
+data/openstax/
+data/*.jsonl
+models/**
+!models/.gitkeep
