@@ -31,6 +31,13 @@ npm run build
 
 > Deploy only the Next.js app. Do not fine-tune models or run heavy local ML models inside Vercel routes.
 
+### Quick troubleshooting for "Server configuration or provider error"
+- Set `EMBEDDING_PROVIDER=openai` unless you have deployed a custom embedding API.
+- If using `EMBEDDING_PROVIDER=custom`, you must set `CUSTOM_EMBEDDING_ENDPOINT` (and optionally `CUSTOM_EMBEDDING_API_KEY`).
+- Ensure `OPENAI_API_KEY` is set for the same Vercel environment (Production / Preview) where you are testing.
+- Ensure `PINECONE_API_KEY`, `PINECONE_INDEX_NAME`, and `PINECONE_NAMESPACE` are set correctly.
+- If Pinecone retrieval fails, the app now still returns Socratic guidance but without sources.
+
 ## Training pipeline (local/GPU only)
 ```bash
 python -m venv .venv
