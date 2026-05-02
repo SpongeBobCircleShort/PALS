@@ -6,7 +6,8 @@ Physics Pals is a Socratic physics tutor web app built with Next.js for Vercel p
 - **Vercel app only:** Next.js UI + lightweight API routes.
 - **Retrieval:** Pinecone stores textbook chunk vectors and metadata.
 - **Embeddings for query-time:**
-  - `EMBEDDING_PROVIDER=openai` (default, easiest)
+  - `EMBEDDING_PROVIDER=bge-local` (default; uses the Transformers.js `Xenova/bge-small-en-v1.5` port of `BAAI/bge-small-en-v1.5`)
+  - `EMBEDDING_PROVIDER=openai`
   - `EMBEDDING_PROVIDER=custom` (hosted fine-tuned endpoint)
 - **Training/indexing:** run locally, Colab, Kaggle, RunPod, Modal, etc. Never on Vercel.
 
@@ -32,10 +33,14 @@ npm run build
 > Deploy only the Next.js app. Do not fine-tune models or run heavy local ML models inside Vercel routes.
 
 ### Quick troubleshooting for "Server configuration or provider error"
-- Set `EMBEDDING_PROVIDER=openai` unless you have deployed a custom embedding API.
+- The default retrieval setup expects:
+  - `EMBEDDING_PROVIDER=bge-local`
+  - `EMBEDDING_MODEL=Xenova/bge-small-en-v1.5`
+  - `PINECONE_INDEX_NAME=pals-database-bge-small`
+  - `PINECONE_NAMESPACE=pals-database`
 - If using `EMBEDDING_PROVIDER=custom`, you must set `CUSTOM_EMBEDDING_ENDPOINT` (and optionally `CUSTOM_EMBEDDING_API_KEY`).
-- Ensure `OPENAI_API_KEY` is set for the same Vercel environment (Production / Preview) where you are testing.
 - Ensure `PINECONE_API_KEY`, `PINECONE_INDEX_NAME`, and `PINECONE_NAMESPACE` are set correctly.
+- If using `EMBEDDING_PROVIDER=openai`, ensure `OPENAI_API_KEY` is set and that the Pinecone index was built with the same OpenAI embedding model.
 - If Pinecone retrieval fails, the app now still returns Socratic guidance but without sources.
 
 ## Training pipeline (local/GPU only)

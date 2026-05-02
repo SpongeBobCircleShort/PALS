@@ -4,7 +4,34 @@ import { config } from "@/lib/config";
 
 const openai = config.openaiApiKey ? new OpenAI({ apiKey: config.openaiApiKey }) : null;
 
+type FeatureExtractionPipeline = (
+  input: string,
+  options: { pooling: "mean"; normalize: boolean }
+) => Promise<{ data: Float32Array | number[] }>;
+
+let bgeExtractorPromise: Promise<FeatureExtractionPipeline> | null = null;
+
+async function getBgeExtractor(): Promise<FeatureExtractionPipeline> {
+  if (!bgeExtractorPromise) {
+    bgeExtractorPromise = import("@xenova/transformers").then(async ({ pipeline, env }) => {
+      env.allowLocalModels = false;
+      return (await pipeline("feature-extraction", config.embeddingModel)) as FeatureExtractionPipeline;
+    });
+  }
+  return bgeExtractorPromise;
+}
+
+async function embedWithBge(text: string): Promise<number[]> {
+  const extractor = await getBgeExtractor();
+  const output = await extractor(`${config.bgeQueryPrefix}${text}`, { pooling: "mean", normalize: true });
+  return Array.from(output.data);
+}
+
 export async function embedText(text: string): Promise<number[]> {
+  if (config.embeddingProvider === "bge-local") {
+    return embedWithBge(text);
+  }
+
   if (config.embeddingProvider === "custom") {
     if (!config.customEmbeddingEndpoint) {
       throw new Error("Server misconfiguration: missing custom embedding endpoint");
