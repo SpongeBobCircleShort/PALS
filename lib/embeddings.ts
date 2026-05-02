@@ -1,3 +1,4 @@
+import "server-only";
 import OpenAI from "openai";
 import { config } from "@/lib/config";
 
@@ -5,7 +6,9 @@ const openai = config.openaiApiKey ? new OpenAI({ apiKey: config.openaiApiKey })
 
 export async function embedText(text: string): Promise<number[]> {
   if (config.embeddingProvider === "custom") {
-    if (!config.customEmbeddingEndpoint) throw new Error("CUSTOM_EMBEDDING_ENDPOINT is required when EMBEDDING_PROVIDER=custom");
+    if (!config.customEmbeddingEndpoint) {
+      throw new Error("Server misconfiguration: missing custom embedding endpoint");
+    }
     const response = await fetch(config.customEmbeddingEndpoint, {
       method: "POST",
       headers: {
@@ -14,13 +17,15 @@ export async function embedText(text: string): Promise<number[]> {
       },
       body: JSON.stringify({ text })
     });
-    if (!response.ok) throw new Error(`Custom embedding endpoint failed: ${response.status}`);
-    const payload = (await response.json()) as { embedding: number[] };
-    if (!Array.isArray(payload.embedding)) throw new Error("Custom embedding response missing embedding array");
+    if (!response.ok) throw new Error("Embedding provider unavailable");
+    const payload = (await response.json()) as { embedding?: number[] };
+    if (!Array.isArray(payload.embedding) || payload.embedding.length === 0) {
+      throw new Error("Embedding provider returned invalid embedding");
+    }
     return payload.embedding;
   }
 
-  if (!openai) throw new Error("OPENAI_API_KEY is required for OPENAI embeddings");
+  if (!openai) throw new Error("Server misconfiguration: missing OPENAI_API_KEY");
   const result = await openai.embeddings.create({ model: config.embeddingModel, input: text });
   return result.data[0].embedding;
 }

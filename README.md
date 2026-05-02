@@ -11,19 +11,33 @@ Physics Pals is a Socratic physics tutor web app built with Next.js for Vercel p
 - **Training/indexing:** run locally, Colab, Kaggle, RunPod, Modal, etc. Never on Vercel.
 
 ## Setup (Web)
+1. Copy `.env.example` to `.env.local`.
+2. Fill in environment values.
+3. Run:
 ```bash
 npm install
 npm run dev
 npm run build
 ```
 
-Copy `.env.example` to `.env.local` and set keys.
-
 ## API
-`POST /api/ask` returns Socratic questions, hint support sentences, takeaway, and sources.
+`POST /api/ask` accepts `{ question, topK, showSources }` and returns Socratic questions, hint support sentences, takeaway, and sources.
 
-## Vercel Deployment
-Deploy only this Next.js app. Add environment variables in the Vercel dashboard. Do **not** train or run large local ML models in Vercel routes.
+## Vercel deployment
+1. Push repo to Git provider.
+2. Import project in Vercel.
+3. Set env vars from `.env.example` in Vercel dashboard.
+4. Deploy.
+
+> Deploy only the Next.js app. Do not fine-tune models or run heavy local ML models inside Vercel routes.
+
+## Training pipeline (local/GPU only)
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r training/requirements.txt
+python training/pipeline.py
+```
 
 ## Custom embedding model hosting options
 1. Keep using OpenAI embeddings in production.
