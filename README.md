@@ -1,6 +1,12 @@
 # Physics Pals
 
+[![CI](https://github.com/SpongeBobCircleShort/PALS/actions/workflows/ci.yml/badge.svg)](https://github.com/SpongeBobCircleShort/PALS/actions/workflows/ci.yml)
+
 Physics Pals is a Socratic physics tutor web app built with Next.js for Vercel plus a separate local/GPU retriever fine-tuning pipeline.
+
+A student types a physics question, or picks one of the example prompts, and presses **Ask**. The app does not hand back a worked answer. It looks up the three closest textbook passages in Pinecone and returns three Socratic questions that lead the student toward the idea, up to two hint sentences picked from those passages (or a short notice asking the student to rephrase if no passages came back), a one-line takeaway built from the first two keywords it finds in the question, then in the matched passage sentences (for example, "Focus on drag + lead and explain how the relationships change step-by-step"), and the passages themselves as sources (file, page, chunk and similarity score). The questions come from topic templates in `lib/socratic.ts` (drag, oscillations, orbits, Fourier modes, Monte Carlo and others); no chat model is called, and the `OPENAI_CHAT_MODEL` setting in `.env.example` is not read by the current code.
+
+![Physics Pals home page: a question box, five example prompts and an Ask button](docs/screenshot.png)
 
 ## Architecture
 - **Vercel app only:** Next.js UI + lightweight API routes.

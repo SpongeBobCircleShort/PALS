@@ -8,3 +8,4 @@ data/openstax/
 data/*.jsonl
 models/**
 !models/.gitkeep
+*.tsbuildinfo
